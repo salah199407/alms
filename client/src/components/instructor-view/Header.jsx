@@ -1,0 +1,165 @@
+"use client";
+
+import { Bell, Search, MessageSquare } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useState } from "react";
+import { useAuth } from "@/context/auth-context";
+import logo from "/logo.png";
+
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+
+function Header() {
+  const { auth, resetCredentials } = useAuth();
+  const user = auth?.user;
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  function handleLogout() {
+    resetCredentials();
+    window.location.href = "/auth";
+  }
+
+  return (
+    <header
+      className="sticky top-0 z-50 flex h-16 w-full items-center justify-between bg-gradient-to-r from-gray-900 to-black px-4 text-white shadow-lg border-b"
+      style={{ fontFamily: 'Helvetica' }}
+    >
+      {/* Logo + Titre */}
+      <div className="flex items-center gap-4">
+        <Link to="/" className="flex items-center gap-2">
+          <img src={logo} alt="Logo" className="h-8 w-8 mr-2" />
+          <span className="font-extrabold text-lg md:text-xl bg-gradient-to-r from-orange-500 to-orange-300 bg-clip-text text-transparent">
+            ODC Learning
+          </span>
+        </Link>
+      </div>
+
+      {/* Search + Icons + Avatar */}
+      <div className="flex items-center gap-4">
+        {/* Search Input */}
+        {isSearchOpen ? (
+          <div className="relative animate-fadeIn">
+            <Input
+              placeholder="Rechercher..."
+              className="w-[250px] bg-gray-800 border-gray-700 text-white rounded-full pl-10"
+              autoFocus
+              onBlur={() => setIsSearchOpen(false)}
+            />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+          </div>
+        ) : (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-white hover:bg-gray-800 rounded-full"
+            onClick={() => setIsSearchOpen(true)}
+          >
+            <Search className="h-5 w-5" />
+            <span className="sr-only">Rechercher</span>
+          </Button>
+        )}
+
+        {/* Message Icon */}
+        <Button variant="ghost" size="icon" className="relative text-white hover:bg-gray-800 rounded-full">
+          <MessageSquare className="h-5 w-5" />
+          <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full bg-orange-500 p-0 flex items-center justify-center text-[10px]">
+            2
+          </Badge>
+          <span className="sr-only">Messages</span>
+        </Button>
+
+        {/* Notification Icon */}
+        <Button variant="ghost" size="icon" className="relative text-white hover:bg-gray-800 rounded-full">
+          <Bell className="h-5 w-5" />
+          <Badge className="absolute -right-1 -top-1 h-5 w-5 rounded-full bg-orange-500 p-0 flex items-center justify-center text-[10px]">
+            3
+          </Badge>
+          <span className="sr-only">Notifications</span>
+        </Button>
+
+        {/* Instructor Title */}
+        <span className="text-lg font-bold bg-gradient-to-r from-orange-400 to-red-500 bg-clip-text text-transparent mr-2">
+          Instructor
+        </span>
+
+        {/* Avatar Dropdown */}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 group">
+              <div className="h-10 w-10 rounded-full border-2 border-orange-500 bg-gradient-to-br from-orange-400 to-red-500 flex items-center justify-center transform transition-transform duration-300 group-hover:scale-110">
+                <span className="text-white font-bold text-lg">
+                  {user?.userName?.charAt(0).toUpperCase() || "I"}
+                </span>
+              </div>
+              <div className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-green-500 border-2 border-gray-900"></div>
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent className="w-56 bg-gray-900 text-white border-none shadow-xl" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal p-4">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user?.userName}</p>
+                <p className="text-xs leading-none text-orange-500 font-bold">
+                  Instructor
+                </p>
+                <p className="text-xs text-gray-400 mt-1">{user?.email}</p>
+              </div>
+            </DropdownMenuLabel>
+
+            <DropdownMenuSeparator className="bg-gray-700" />
+
+            <DropdownMenuItem asChild className="hover:bg-gray-800 focus:bg-gray-800 cursor-pointer">
+              <Link to="/profile-settings" className="w-full px-4 py-2 flex items-center gap-2">
+                <div className="h-8 w-8 rounded-full bg-gray-800 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                  </svg>
+                </div>
+                <span>Profile Settings</span>
+              </Link>
+            </DropdownMenuItem>
+
+            <DropdownMenuItem className="hover:bg-gray-800 focus:bg-gray-800 cursor-pointer px-4 py-2 flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-gray-800 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                  <line x1="12" y1="9" x2="12" y2="13"></line>
+                  <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                </svg>
+              </div>
+              <span>Help Center</span>
+            </DropdownMenuItem>
+
+            <DropdownMenuSeparator className="bg-gray-700" />
+
+            <DropdownMenuItem 
+              className="text-red-500 hover:bg-red-500/10 focus:bg-red-500/10 cursor-pointer px-4 py-2 flex items-center gap-2 font-semibold"
+              onClick={handleLogout}
+            >
+              <div className="h-8 w-8 rounded-full bg-red-500/20 flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                  <polyline points="16 17 21 12 16 7"></polyline>
+                  <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+              </div>
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </header>
+  );
+}
+
+export default Header;

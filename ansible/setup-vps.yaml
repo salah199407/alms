@@ -1,0 +1,56 @@
+---
+- name: Setup VPS for MERN app
+  hosts: webservers
+  become: yes
+  
+  tasks:
+    - name: Update apt package index
+      apt:
+        update_cache: yes
+      
+    - name: Install required system packages
+      apt:
+        name: "{{ packages }}"
+        state: present
+      vars:
+        packages:
+          - curl
+          - git
+          - python3-pip
+          - gnupg
+          - apt-transport-https
+          - ca-certificates
+          - software-properties-common
+          
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+        
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
+        state: present
+        
+    - name: Install Docker
+      apt:
+        name: docker-ce
+        state: present
+        
+    - name: Install Docker Compose
+      pip:
+        name: docker-compose
+        
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+        
+    - name: Install Robot Framework and dependencies
+      pip:
+        name:
+          - robotframework
+          - robotframework-seleniumlibrary
+          - requests
+        state: present

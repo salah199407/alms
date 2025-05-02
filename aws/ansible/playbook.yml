@@ -1,0 +1,76 @@
+---
+- name: Préparer une instance EC2 pour déployer une application MERN avec Docker
+  hosts: ec2
+  become: yes  # Nécessite les privilèges sudo
+
+  tasks:
+    - name:  Mettre à jour les paquets APT
+      apt:
+        update_cache: yes
+
+    - name:  Installer les dépendances de base
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - software-properties-common
+          - git
+        state: present
+
+    - name:  Ajouter la clé GPG officielle de Docker
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name:  Ajouter le dépôt Docker APT
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu focal stable
+        state: present
+
+    - name:  Installer Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name:  Installer Docker Compose
+      get_url:
+        url: https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-linux-x86_64
+        dest: /usr/local/bin/docker-compose
+        mode: '0755'
+
+    - name:  Ajouter l’utilisateur au groupe docker (permet d'exécuter docker sans sudo)
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name:  Créer le dossier de l'application
+      file:
+        path: /home/{{ ansible_user }}/mern-app
+        state: directory
+        owner: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name:  Cloner le dépôt Git contenant l'application MERN (facultatif)
+      git:
+        repo: 'git@github.com:votre-utilisateur/votre-repo.git'  # Remplacez par l'URL de votre repo
+        dest: /home/{{ ansible_user }}/mern-app
+        version: main
+      become: no
+
+    # 🚀 Déploiement automatique (facultatif)
+    - name:  Mettre à jour le dépôt avec git pull
+      command: git pull origin main
+      args:
+        chdir: /home/{{ ansible_user }}/mern-app
+      become: no
+
+    - name:  Lancer l'application avec Docker Compose
+      command: docker-compose up -d --build
+      args:
+        chdir: /home/{{ ansible_user }}/mern-app
