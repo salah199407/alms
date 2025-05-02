@@ -25,7 +25,7 @@ const MONGO_URI = process.env.MONGO_URI
 
 // Configuration CORS
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || "http://localhost:7000",
+  origin: process.env.FRONTEND_URL || "https://odc-learning.com",
   methods: ["GET", "POST", "DELETE", "PUT", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
@@ -73,7 +73,7 @@ app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "em
 
 app.get("/auth/google/callback", passport.authenticate("google", {
   failureRedirect: "/",
-  successRedirect: process.env.FRONTEND_URL || "http://localhost:7000/home",
+  successRedirect: process.env.FRONTEND_URL || "https://odc-learning.com/home",
 }))
 
 // Routes API
